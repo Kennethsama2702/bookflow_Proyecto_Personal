@@ -1,0 +1,1 @@
+// TODO: Cada cambio de esquema es un archivo de migración numerado, no un init.sql único.
