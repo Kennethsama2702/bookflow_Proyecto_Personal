@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { pool } from "./db";
 import { AuthRepository } from "./auth/auth.repository";
 import { AuthService } from "./auth/auth.service";
@@ -8,6 +9,7 @@ import { requireAuth, AuthenticatedRequest } from "./auth/auth.middleware";
 
 export function buildApp() {
   const app = express();
+  app.use(cors());
   app.use(express.json());
 
   const authRepository = new AuthRepository(pool);
