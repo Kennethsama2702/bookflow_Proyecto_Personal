@@ -1,13 +1,13 @@
-export class EmailAlreadyRegisteredError extends Error {
+import { DomainError } from "../shared/errors/domain-error";
+
+export class EmailRegistradoError extends DomainError {
   constructor(email: string) {
     super(`El correo ${email} ya está registrado`);
-    this.name = 'EmailAlreadyRegisteredError';
   }
 }
 
-export class InvalidCredentialsError extends Error {
+export class CredencialesIncorrectasError extends DomainError {
   constructor() {
-    super('Correo o contraseña incorrectos');
-    this.name = 'InvalidCredentialsError';
+    super("Correo o contraseña incorrectos");
   }
 }
