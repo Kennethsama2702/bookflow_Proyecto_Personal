@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { CalendarClock, User, Lock, Mail } from "lucide-react";
+import { User, Lock, Mail } from "lucide-react";
+import isotipo from "../../assets/isotipo.png";
 import { register, login } from "../../api";
 import "./authscreen.css";
 
@@ -50,7 +51,7 @@ export default function AuthScreen({ onAuthSuccess }: Props) {
         transition={{ duration: 0.4 }}
       >
         <div className="auth-icon">
-          <CalendarClock size={34} strokeWidth={1.5} />
+          <img src={isotipo} alt="BookFlow" />
         </div>
 
         <AnimatePresence mode="wait">

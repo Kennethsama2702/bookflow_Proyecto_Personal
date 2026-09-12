@@ -1,11 +1,17 @@
 .sidebar {
   width: 230px;
   min-height: 100vh;
-  background: #0f172a;
-  border-right: 1px solid #1e293b;
+  background: var(--bg-sidebar);
   display: flex;
   flex-direction: column;
-  padding: 1.5rem 1rem;
+  padding: 1.25rem 1rem;
+  transition: width 0.2s ease;
+  flex-shrink: 0;
+}
+
+.sidebar.collapsed {
+  width: 76px;
+  padding: 1.25rem 0.6rem;
 }
 
 .sidebar-brand {
@@ -13,10 +19,19 @@
   align-items: center;
   gap: 0.6rem;
   font-weight: 700;
-  font-size: 1.1rem;
-  color: white;
-  padding: 0 0.5rem;
-  margin-bottom: 2.5rem;
+  font-size: 1.05rem;
+  color: var(--text-primary);
+  padding: 0 0.4rem;
+  margin-bottom: 2rem;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.sidebar-logo {
+  width: 30px;
+  height: 30px;
+  object-fit: contain;
+  flex-shrink: 0;
 }
 
 .sidebar-nav {
@@ -34,55 +49,49 @@
   border-radius: 10px;
   border: none;
   background: transparent;
-  color: #94a3b8;
+  color: var(--text-secondary);
   font-size: 0.9rem;
   cursor: pointer;
   text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
   transition:
     background 0.15s,
     color 0.15s;
 }
 
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+  padding: 0.7rem;
+}
+
 .sidebar-item:hover {
-  background: #1e293b;
-  color: #e2e8f0;
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
 }
 .sidebar-item.active {
-  background: #2563eb;
+  background: var(--accent);
   color: white;
 }
 
-.sidebar-footer {
-  border-top: 1px solid #1e293b;
-  padding-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.6rem;
-}
-
-.sidebar-user {
-  font-size: 0.78rem;
-  color: #64748b;
-  padding: 0 0.5rem;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.sidebar-logout {
+.sidebar-collapse-btn {
   display: flex;
   align-items: center;
-  gap: 0.7rem;
+  gap: 0.6rem;
   background: transparent;
   border: none;
-  color: #94a3b8;
-  padding: 0.6rem 0.5rem;
+  color: var(--text-muted);
+  padding: 0.6rem 0.8rem;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.8rem;
 }
 
-.sidebar-logout:hover {
-  background: #1e293b;
-  color: #f87171;
+.sidebar.collapsed .sidebar-collapse-btn {
+  justify-content: center;
+  padding: 0.6rem;
+}
+.sidebar-collapse-btn:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
 }

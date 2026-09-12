@@ -21,9 +21,18 @@ export function buildApp() {
 
   // Ruta protegida de ejemplo: confirma que requireAuth funciona de punta a
   // punta antes de que exista bookings. Bookings la va a usar igual más adelante.
-  app.get("/me", requireAuth(authService), (req: AuthenticatedRequest, res) => {
-    res.json({ user: req.user });
-  });
-
+  app.get(
+    "/me",
+    requireAuth(authService),
+    async (req: AuthenticatedRequest, res) => {
+      const user = await authRepository.findById(req.user!.id);
+      if (!user) {
+        return res.status(404).json({ error: "Usuario no encontrado" });
+      }
+      res.json({
+        user: { id: user.id, email: user.email, fullName: user.full_name },
+      });
+    },
+  );
   return { app, authService };
 }

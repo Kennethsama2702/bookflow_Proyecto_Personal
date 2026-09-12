@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { AnimatePresence } from "framer-motion";
+import { ThemeProvider } from "./context/themecontext";
 import AuthScreen from "./components/auth/authscreen";
 import LoadingScreen from "./components/loadingscreen";
 import AppShell from "./components/layout/appshell";
@@ -12,6 +13,7 @@ export default function App() {
     localStorage.getItem("token"),
   );
   const [userEmail, setUserEmail] = useState<string | null>(null);
+  const [fullName, setFullName] = useState<string | null>(null);
   const [phase, setPhase] = useState<Phase>("checking");
 
   useEffect(() => {
@@ -22,6 +24,7 @@ export default function App() {
     fetchMe(token)
       .then((res) => {
         setUserEmail(res.user.email);
+        setFullName(res.user.fullName);
         setPhase("app");
       })
       .catch(() => {
@@ -39,6 +42,7 @@ export default function App() {
     fetchMe(newToken)
       .then((res) => {
         setUserEmail(res.user.email);
+        setFullName(res.user.fullName);
         setTimeout(() => setPhase("app"), 900);
       })
       .catch(() => {
@@ -52,19 +56,27 @@ export default function App() {
     localStorage.removeItem("token");
     setToken(null);
     setUserEmail(null);
+    setFullName(null);
     setPhase("auth");
   }
 
   return (
-    <AnimatePresence mode="wait">
-      {phase === "checking" && <LoadingScreen key="checking" />}
-      {phase === "auth" && (
-        <AuthScreen key="auth" onAuthSuccess={handleAuthSuccess} />
-      )}
-      {phase === "loading" && <LoadingScreen key="loading" />}
-      {phase === "app" && userEmail && (
-        <AppShell key="app" userEmail={userEmail} onLogout={handleLogout} />
-      )}
-    </AnimatePresence>
+    <ThemeProvider>
+      <AnimatePresence mode="wait">
+        {phase === "checking" && <LoadingScreen key="checking" />}
+        {phase === "auth" && (
+          <AuthScreen key="auth" onAuthSuccess={handleAuthSuccess} />
+        )}
+        {phase === "loading" && <LoadingScreen key="loading" />}
+        {phase === "app" && userEmail && fullName && (
+          <AppShell
+            key="app"
+            userEmail={userEmail}
+            fullName={fullName}
+            onLogout={handleLogout}
+          />
+        )}
+      </AnimatePresence>
+    </ThemeProvider>
   );
 }

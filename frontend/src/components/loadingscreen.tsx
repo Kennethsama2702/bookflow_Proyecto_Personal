@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import "./LoadingScreen.css";
+import "./loadingscreen.css";
 
 export default function LoadingScreen() {
   return (

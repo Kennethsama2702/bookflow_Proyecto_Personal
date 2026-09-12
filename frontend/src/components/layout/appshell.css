@@ -1,21 +1,27 @@
 .app-shell {
   display: flex;
   min-height: 100vh;
-  background: #0b1220;
+  background: var(--bg-app);
+}
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
 }
 .app-content {
   flex: 1;
-  padding: 2.5rem 3rem;
+  padding: 0.5rem 2.5rem 2.5rem;
   overflow-y: auto;
 }
 
 .page h1 {
   margin: 0 0 0.3rem;
   font-size: 1.6rem;
-  color: white;
+  color: var(--text-primary);
 }
 .page-subtitle {
-  color: #64748b;
+  color: var(--text-muted);
   font-size: 0.9rem;
   margin-bottom: 2rem;
 }
@@ -28,8 +34,8 @@
 }
 
 .stat-card {
-  background: #1e293b;
-  border: 1px solid #334155;
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
   border-radius: 12px;
   padding: 1.2rem;
   display: flex;
@@ -39,19 +45,39 @@
 
 .stat-label {
   font-size: 0.78rem;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 .stat-value {
   font-size: 1.4rem;
   font-weight: 700;
-  color: white;
+  color: var(--text-primary);
 }
 
 .placeholder-block {
-  border: 1.5px dashed #334155;
+  border: 1.5px dashed var(--border-subtle);
   border-radius: 12px;
   padding: 3rem;
   text-align: center;
-  color: #475569;
+  color: var(--text-muted);
   font-size: 0.9rem;
+}
+.chart-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.chart-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1.2rem;
+}
+
+.chart-title {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 0.8rem;
 }

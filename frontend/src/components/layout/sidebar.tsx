@@ -2,17 +2,18 @@ import {
   LayoutDashboard,
   CalendarClock,
   MessageSquare,
-  LogOut,
+  ChevronLeft,
 } from "lucide-react";
-import "./Sidebar.css";
+import isotipo from "../../assets/isotipo.png";
+import "./sidebar.css";
 
 export type ModuleKey = "dashboard" | "agenda" | "chat";
 
 interface Props {
   active: ModuleKey;
   onSelect: (key: ModuleKey) => void;
-  userEmail: string;
-  onLogout: () => void;
+  collapsed: boolean;
+  onToggleCollapsed: () => void;
 }
 
 const ITEMS: { key: ModuleKey; label: string; icon: React.ReactNode }[] = [
@@ -24,14 +25,14 @@ const ITEMS: { key: ModuleKey; label: string; icon: React.ReactNode }[] = [
 export default function Sidebar({
   active,
   onSelect,
-  userEmail,
-  onLogout,
+  collapsed,
+  onToggleCollapsed,
 }: Props) {
   return (
-    <aside className="sidebar">
+    <aside className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-brand">
-        <CalendarClock size={22} />
-        <span>BookFlow</span>
+        <img src={isotipo} alt="BookFlow" className="sidebar-logo" />
+        {!collapsed && <span>BookFlow</span>}
       </div>
 
       <nav className="sidebar-nav">
@@ -40,22 +41,24 @@ export default function Sidebar({
             key={item.key}
             className={`sidebar-item ${active === item.key ? "active" : ""}`}
             onClick={() => onSelect(item.key)}
+            title={collapsed ? item.label : undefined}
           >
             {item.icon}
-            <span>{item.label}</span>
+            {!collapsed && <span>{item.label}</span>}
           </button>
         ))}
       </nav>
 
-      <div className="sidebar-footer">
-        <div className="sidebar-user" title={userEmail}>
-          {userEmail}
-        </div>
-        <button className="sidebar-logout" onClick={onLogout}>
-          <LogOut size={18} />
-          <span>Cerrar sesión</span>
-        </button>
-      </div>
+      <button className="sidebar-collapse-btn" onClick={onToggleCollapsed}>
+        <ChevronLeft
+          size={18}
+          style={{
+            transform: collapsed ? "rotate(180deg)" : "none",
+            transition: "transform 0.2s",
+          }}
+        />
+        {!collapsed && <span>Colapsar</span>}
+      </button>
     </aside>
   );
 }

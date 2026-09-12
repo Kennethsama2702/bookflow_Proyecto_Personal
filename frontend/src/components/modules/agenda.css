@@ -1,0 +1,75 @@
+.agenda-calendar-wrap {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-subtle);
+  border-radius: 12px;
+  padding: 1rem;
+}
+
+/* Re-skin de react-big-calendar para que respete el tema claro/oscuro
+   -- la librería trae su propio CSS pensado para fondo blanco, así que
+   sobreescribimos las clases clave con nuestras variables. */
+.agenda-calendar-wrap .rbc-calendar {
+  color: var(--text-primary);
+}
+
+.agenda-calendar-wrap .rbc-toolbar button {
+  color: var(--text-secondary);
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-app);
+}
+
+.agenda-calendar-wrap .rbc-toolbar button:hover {
+  background: var(--bg-surface-hover);
+  color: var(--text-primary);
+}
+
+.agenda-calendar-wrap .rbc-toolbar button.rbc-active {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.agenda-calendar-wrap .rbc-toolbar-label {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.agenda-calendar-wrap .rbc-header {
+  color: var(--text-secondary);
+  border-color: var(--border-subtle);
+  padding: 0.5rem 0;
+}
+
+.agenda-calendar-wrap .rbc-month-view,
+.agenda-calendar-wrap .rbc-time-view,
+.agenda-calendar-wrap .rbc-time-header,
+.agenda-calendar-wrap .rbc-time-content,
+.agenda-calendar-wrap .rbc-day-bg,
+.agenda-calendar-wrap .rbc-header,
+.agenda-calendar-wrap .rbc-time-gutter,
+.agenda-calendar-wrap .rbc-timeslot-group,
+.agenda-calendar-wrap .rbc-agenda-view table {
+  border-color: var(--border-subtle);
+}
+
+.agenda-calendar-wrap .rbc-off-range-bg {
+  background: var(--bg-app);
+}
+.agenda-calendar-wrap .rbc-today {
+  background: color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+.agenda-calendar-wrap .rbc-event {
+  background: var(--accent);
+  border: none;
+  border-radius: 6px;
+}
+
+.agenda-calendar-wrap .rbc-agenda-view table.rbc-agenda-table thead {
+  color: var(--text-secondary);
+}
+
+.agenda-calendar-wrap .rbc-agenda-view table.rbc-agenda-table tbody > tr > td {
+  border-color: var(--border-subtle);
+  color: var(--text-primary);
+}

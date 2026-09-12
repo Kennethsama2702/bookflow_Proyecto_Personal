@@ -44,7 +44,7 @@ export async function login(
 }
 
 export interface MeResponse {
-  user: { id: string; email: string };
+  user: { id: string; email: string; fullName: string };
 }
 
 export async function fetchMe(token: string): Promise<MeResponse> {
