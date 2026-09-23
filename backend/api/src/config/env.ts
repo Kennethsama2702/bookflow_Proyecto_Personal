@@ -1,7 +1,19 @@
 // dotenv/config lee el archivo .env de la raíz de api/ y llena process.env
 // ANTES de que el resto de este archivo se ejecute. Sin esta línea, .env
 // existiría pero Node nunca lo leería.
-import "dotenv/config";
+import dotenv from "dotenv";
+
+const environment = process.env.NODE_ENV ?? "development";
+if (
+  !(["development", "test", "production"] as const).includes(
+    environment as never,
+  )
+) {
+  throw new Error("NODE_ENV debe ser development, test o production");
+}
+
+dotenv.config({ path: `.env.${environment}` });
+dotenv.config();
 
 function requiredEnv(name: string, minimumLength = 1): string {
   const value = process.env[name]?.trim();
@@ -21,7 +33,8 @@ const allowedOrigins = (process.env.CORS_ORIGINS ?? "http://localhost:5173")
   .filter(Boolean);
 
 export const env = {
-  isProduction,
+  environment: environment as "development" | "test" | "production",
+  isProduction: environment === "production",
   port: Number(process.env.PORT ?? 3000),
 
   db: {

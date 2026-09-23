@@ -7,6 +7,7 @@ import {
   SesionInvalidaError,
 } from "./auth.errors";
 import { loginSchema, registerSchema } from "./auth.validation";
+import { logger } from "../shared/logging/logger";
 
 const REFRESH_COOKIE = "bookflow_refresh";
 const refreshCookieOptions = {
@@ -44,7 +45,10 @@ export class AuthController {
       } else if (err instanceof ZodError) {
         res.status(400).json({ error: "Los datos de registro no son válidos" });
       } else {
-        console.error(err);
+        logger.error("auth_register_failed", {
+          requestId: req.requestId,
+          error: err,
+        });
         res.status(500).json({ error: "Error interno" });
       }
     }
@@ -66,7 +70,10 @@ export class AuthController {
       } else if (err instanceof ZodError) {
         res.status(400).json({ error: "Los datos de acceso no son válidos" });
       } else {
-        console.error(err);
+        logger.error("auth_login_failed", {
+          requestId: req.requestId,
+          error: err,
+        });
         res.status(500).json({ error: "Error interno" });
       }
     }
@@ -86,7 +93,10 @@ export class AuthController {
       if (err instanceof SesionInvalidaError) {
         res.status(401).json({ error: err.message });
       } else {
-        console.error(err);
+        logger.error("auth_refresh_failed", {
+          requestId: req.requestId,
+          error: err,
+        });
         res.status(500).json({ error: "Error interno" });
       }
     }

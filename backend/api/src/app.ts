@@ -10,10 +10,13 @@ import { AuthController } from "./auth/auth.controller";
 import { authRoutes } from "./auth/auth.routes";
 import { requireAuth, AuthenticatedRequest } from "./auth/auth.middleware";
 import { env } from "./config/env";
+import { requestContext } from "./shared/http/request-context";
+import { errorHandler } from "./shared/http/error-handler";
 
 export function buildApp() {
   const app = express();
   app.set("trust proxy", env.isProduction ? 1 : false);
+  app.use(requestContext);
   app.use(helmet());
   app.use(cors({ origin: env.corsOrigins, credentials: true }));
   app.use(express.json({ limit: "16kb" }));
@@ -33,6 +36,14 @@ export function buildApp() {
   const authController = new AuthController(authService);
 
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
+  app.get("/health/ready", async (_req, res, next) => {
+    try {
+      await pool.query("SELECT 1");
+      res.json({ status: "ready", checks: { database: "ok" } });
+    } catch (error) {
+      next(error);
+    }
+  });
   app.use(authRoutes(authController));
 
   // Ruta protegida de ejemplo: confirma que requireAuth funciona de punta a
@@ -50,5 +61,6 @@ export function buildApp() {
       });
     },
   );
+  app.use(errorHandler);
   return { app, authService };
 }
