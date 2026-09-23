@@ -3,11 +3,25 @@
 // existiría pero Node nunca lo leería.
 import "dotenv/config";
 
-// Centraliza TODAS las variables de entorno en un solo lugar.
-// Ventaja: si falta una, te enteras al arrancar la app (falla rápido y claro),
-// no a mitad de una request cuando ya es tarde para diagnosticarlo fácil.
+function requiredEnv(name: string, minimumLength = 1): string {
+  const value = process.env[name]?.trim();
+  if (!value || value.length < minimumLength) {
+    throw new Error(
+      `${name} es obligatorio y debe tener al menos ${minimumLength} caracteres`,
+    );
+  }
+  return value;
+}
+
+const isProduction = process.env.NODE_ENV === "production";
+const jwtSecret = requiredEnv("JWT_SECRET", 32);
+const allowedOrigins = (process.env.CORS_ORIGINS ?? "http://localhost:5173")
+  .split(",")
+  .map((origin) => origin.trim())
+  .filter(Boolean);
 
 export const env = {
+  isProduction,
   port: Number(process.env.PORT ?? 3000),
 
   db: {
@@ -18,5 +32,8 @@ export const env = {
     database: process.env.DB_NAME ?? "proyecto_personal",
   },
 
-  jwtSecret: process.env.JWT_SECRET ?? "dev-secret-cambiar-en-produccion",
+  jwtSecret,
+  jwtIssuer: process.env.JWT_ISSUER ?? "bookflow-api",
+  jwtAudience: process.env.JWT_AUDIENCE ?? "bookflow-web",
+  corsOrigins: allowedOrigins,
 };

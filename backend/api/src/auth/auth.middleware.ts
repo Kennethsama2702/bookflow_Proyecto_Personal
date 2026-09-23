@@ -11,12 +11,12 @@ export interface AuthenticatedRequest extends Request {
 export function requireAuth(authService: AuthService) {
   return (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
     const header = req.headers.authorization;
-    if (!header || !header.startsWith("Bearer ")) {
+    if (!header || !/^Bearer\s+\S+$/.test(header)) {
       return res
         .status(401)
         .json({ error: "Falta el header Authorization: Bearer <token>" });
     }
-    const token = header.slice("Bearer ".length);
+    const token = header.slice("Bearer ".length).trim();
     try {
       const payload = authService.verifyToken(token);
       req.user = { id: payload.sub, email: payload.email };

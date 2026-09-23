@@ -4,7 +4,7 @@ import { Bot, X, Send } from "lucide-react";
 import MessageBubble from "../chat/messagebubble";
 import { useLocalChatHistory } from "../chat/uselocalchathistory";
 import type { ChatMessage } from "../chat/types";
-import "./ChatbotWidget.css";
+import "./chatbotwidget.css";
 
 interface Props {
   fullName: string;

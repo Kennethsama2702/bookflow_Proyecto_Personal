@@ -1,16 +1,32 @@
 import express from "express";
 import cors from "cors";
+import cookieParser from "cookie-parser";
+import helmet from "helmet";
+import rateLimit from "express-rate-limit";
 import { pool } from "./db";
 import { AuthRepository } from "./auth/auth.repository";
 import { AuthService } from "./auth/auth.service";
 import { AuthController } from "./auth/auth.controller";
 import { authRoutes } from "./auth/auth.routes";
 import { requireAuth, AuthenticatedRequest } from "./auth/auth.middleware";
+import { env } from "./config/env";
 
 export function buildApp() {
   const app = express();
-  app.use(cors());
-  app.use(express.json());
+  app.set("trust proxy", env.isProduction ? 1 : false);
+  app.use(helmet());
+  app.use(cors({ origin: env.corsOrigins, credentials: true }));
+  app.use(express.json({ limit: "16kb" }));
+  app.use(cookieParser());
+
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 20,
+    standardHeaders: "draft-8",
+    legacyHeaders: false,
+    message: { error: "Demasiados intentos. Intenta de nuevo más tarde." },
+  });
+  app.use("/auth", authLimiter);
 
   const authRepository = new AuthRepository(pool);
   const authService = new AuthService(authRepository);

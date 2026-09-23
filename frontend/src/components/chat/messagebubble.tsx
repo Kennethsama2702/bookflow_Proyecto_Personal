@@ -1,5 +1,5 @@
 import type { ChatMessage } from "./types";
-import "./MessageBubble.css";
+import "./messagebubble.css";
 
 export default function MessageBubble({ message }: { message: ChatMessage }) {
   const time = new Date(message.timestamp).toLocaleTimeString([], {

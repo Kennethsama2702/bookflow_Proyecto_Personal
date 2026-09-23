@@ -26,6 +26,7 @@ export async function register(
   const res = await fetch(`${API_URL}/auth/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password, fullName }),
   });
   return handleResponse<AuthResponse>(res);
@@ -38,9 +39,25 @@ export async function login(
   const res = await fetch(`${API_URL}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({ email, password }),
   });
   return handleResponse<AuthResponse>(res);
+}
+
+export async function refresh(): Promise<AuthResponse> {
+  const res = await fetch(`${API_URL}/auth/refresh`, {
+    method: "POST",
+    credentials: "include",
+  });
+  return handleResponse<AuthResponse>(res);
+}
+
+export async function logout(): Promise<void> {
+  await fetch(`${API_URL}/auth/logout`, {
+    method: "POST",
+    credentials: "include",
+  });
 }
 
 export interface MeResponse {

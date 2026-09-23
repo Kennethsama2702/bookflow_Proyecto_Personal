@@ -10,6 +10,11 @@ export interface User {
   created_at: string;
 }
 
+export interface SessionMetadata {
+  userAgent?: string;
+  ipAddress?: string;
+}
+
 // Código de error de MySQL para "entrada duplicada" (viola un UNIQUE).
 // Es el equivalente al '23505' que usábamos en Postgres -- el nombre y el
 // código cambian por completo entre motores, hay que fijarse en la doc de cada uno.
@@ -56,5 +61,103 @@ export class AuthRepository {
       [id],
     );
     return (rows[0] as User) ?? null;
+  }
+
+  async createSession(
+    userId: string,
+    tokenHash: string,
+    sessionId: string,
+    expiresAt: Date,
+    metadata: SessionMetadata,
+  ): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO auth_sessions
+        (id, user_id, token_hash, expires_at, user_agent, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        sessionId,
+        userId,
+        tokenHash,
+        expiresAt,
+        metadata.userAgent ?? null,
+        metadata.ipAddress ?? null,
+      ],
+    );
+  }
+
+  async rotateSession(
+    tokenHash: string,
+    replacementTokenHash: string,
+    replacementSessionId: string,
+    expiresAt: Date,
+    metadata: SessionMetadata,
+  ): Promise<User | null> {
+    const connection = await this.pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [rows] = await connection.query<any[]>(
+        `SELECT s.id AS session_id, s.user_id, s.expires_at, s.revoked_at,
+                u.email, u.password_hash, u.full_name, u.created_at
+         FROM auth_sessions s
+         JOIN users u ON u.id = s.user_id
+         WHERE s.token_hash = ?
+         FOR UPDATE`,
+        [tokenHash],
+      );
+      const session = rows[0];
+      if (
+        !session ||
+        session.revoked_at ||
+        new Date(session.expires_at) <= new Date()
+      ) {
+        await connection.rollback();
+        return null;
+      }
+
+      await connection.query(
+        `INSERT INTO auth_sessions
+          (id, user_id, token_hash, expires_at, user_agent, ip_address)
+         VALUES (?, ?, ?, ?, ?, ?)`,
+        [
+          replacementSessionId,
+          session.user_id,
+          replacementTokenHash,
+          expiresAt,
+          metadata.userAgent ?? null,
+          metadata.ipAddress ?? null,
+        ],
+      );
+      const [updateResult] = await connection.query<any>(
+        `UPDATE auth_sessions
+         SET revoked_at = CURRENT_TIMESTAMP, replaced_by_id = ?
+         WHERE id = ? AND revoked_at IS NULL`,
+        [replacementSessionId, session.session_id],
+      );
+      if (updateResult.affectedRows !== 1) {
+        await connection.rollback();
+        return null;
+      }
+      await connection.commit();
+      return {
+        id: session.user_id,
+        email: session.email,
+        password_hash: session.password_hash,
+        full_name: session.full_name,
+        created_at: session.created_at,
+      };
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  async revokeSession(tokenHash: string): Promise<void> {
+    await this.pool.query(
+      `UPDATE auth_sessions SET revoked_at = CURRENT_TIMESTAMP
+       WHERE token_hash = ? AND revoked_at IS NULL`,
+      [tokenHash],
+    );
   }
 }

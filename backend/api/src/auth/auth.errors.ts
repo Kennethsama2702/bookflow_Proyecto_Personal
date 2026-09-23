@@ -11,3 +11,9 @@ export class CredencialesIncorrectasError extends DomainError {
     super("Correo o contraseña incorrectos");
   }
 }
+
+export class SesionInvalidaError extends DomainError {
+  constructor() {
+    super("La sesión no es válida o ha expirado");
+  }
+}
