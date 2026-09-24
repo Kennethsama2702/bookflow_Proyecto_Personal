@@ -21,17 +21,29 @@
   font-weight: 700;
   font-size: 1.05rem;
   color: var(--text-primary);
-  padding: 0 0.4rem;
+  padding: 0 0.2rem;
   margin-bottom: 2rem;
   overflow: hidden;
   white-space: nowrap;
 }
 
 .sidebar-logo {
-  width: 30px;
-  height: 30px;
+  width: 148px;
+  height: 48px;
   object-fit: contain;
   flex-shrink: 0;
+}
+.sidebar-brand picture {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.sidebar.collapsed .sidebar-logo {
+  width: 42px;
+  height: 42px;
+  margin: 0 auto;
+  object-fit: contain;
 }
 
 .sidebar-nav {
@@ -71,7 +83,8 @@
 }
 .sidebar-item.active {
   background: var(--accent);
-  color: white;
+  color: #111;
+  font-weight: 800;
 }
 
 .sidebar-collapse-btn {

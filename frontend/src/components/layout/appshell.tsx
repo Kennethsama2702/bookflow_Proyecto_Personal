@@ -4,18 +4,19 @@ import type { ModuleKey } from "./sidebar";
 import TopBar from "./topbar";
 import ChatbotWidget from "../chatbot/chatbotwidget";
 import DashboardPage from "../modules/dashboardpage";
-import AgendaPage from "../modules/agendapage";
-import ChatPage from "../modules/chatpage";
+import RoleAccessPage from "../modules/roleaccesspage";
+import type { UserRole } from "../../api";
 import "./appshell.css";
 
 interface Props {
   userEmail: string;
   fullName: string;
   onLogout: () => void;
+  role: UserRole;
 }
 
-export default function AppShell({ fullName, onLogout }: Props) {
-  const [activeModule, setActiveModule] = useState<ModuleKey>("dashboard");
+export default function AppShell({ fullName, onLogout, role }: Props) {
+  const [activeModule, setActiveModule] = useState<ModuleKey>("access");
   const [collapsed, setCollapsed] = useState(false);
 
   return (
@@ -25,19 +26,19 @@ export default function AppShell({ fullName, onLogout }: Props) {
         onSelect={setActiveModule}
         collapsed={collapsed}
         onToggleCollapsed={() => setCollapsed((c) => !c)}
+        role={role}
       />
 
       <div className="app-main">
         <TopBar fullName={fullName} onLogout={onLogout} />
 
         <main className="app-content">
+          {activeModule === "access" && <RoleAccessPage role={role} />}
           {activeModule === "dashboard" && <DashboardPage />}
-          {activeModule === "agenda" && <AgendaPage />}
-          {activeModule === "chat" && <ChatPage fullName={fullName} />}
         </main>
       </div>
 
-      <ChatbotWidget fullName={fullName} />
+      <ChatbotWidget fullName={fullName} role={role} />
     </div>
   );
 }

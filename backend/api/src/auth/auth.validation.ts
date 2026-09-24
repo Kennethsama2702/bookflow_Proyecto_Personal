@@ -23,5 +23,17 @@ export const loginSchema = z
   })
   .strict();
 
+export const passwordResetRequestSchema = z
+  .object({ email: z.string().trim().toLowerCase().email().max(254) })
+  .strict();
+
+export const passwordResetSchema = z
+  .object({ token: z.string().min(32).max(200), password: passwordSchema })
+  .strict();
+
+export const emailVerificationSchema = z
+  .object({ token: z.string().min(32).max(200) })
+  .strict();
+
 export type RegisterInput = z.infer<typeof registerSchema>;
 export type LoginInput = z.infer<typeof loginSchema>;

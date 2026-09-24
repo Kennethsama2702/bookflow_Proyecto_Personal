@@ -3,6 +3,10 @@ import jwt from "jsonwebtoken";
 import { createHash, randomBytes, randomUUID } from "crypto";
 import { AuthRepository, SessionMetadata, User } from "./auth.repository";
 import {
+  AuthNotificationService,
+  LoggingAuthNotificationService,
+} from "./auth.notifications";
+import {
   CredencialesIncorrectasError,
   SesionInvalidaError,
 } from "./auth.errors";
@@ -26,7 +30,10 @@ export interface AuthResult {
 }
 
 export class AuthService {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(
+    private readonly authRepository: AuthRepository,
+    private readonly notifications: AuthNotificationService = new LoggingAuthNotificationService(),
+  ) {}
 
   async register(
     email: string,
@@ -40,7 +47,44 @@ export class AuthService {
       passwordHash,
       fullName,
     );
+    await this.issueEmailVerification(user);
     return this.buildAuthResponse(user, metadata);
+  }
+
+  async requestPasswordReset(email: string): Promise<void> {
+    const user = await this.authRepository.findByEmail(email);
+    if (!user) return;
+    const token = this.createActionToken();
+    await this.authRepository.createActionToken(
+      user.id,
+      this.hashActionToken(token),
+      "password_reset",
+      this.actionExpiry(30),
+    );
+    await this.notifications.sendPasswordReset(user.email, token);
+  }
+
+  async resetPassword(token: string, password: string): Promise<boolean> {
+    const userId = await this.authRepository.consumeActionToken(
+      this.hashActionToken(token),
+      "password_reset",
+    );
+    if (!userId) return false;
+    await this.authRepository.updatePassword(
+      userId,
+      await bcrypt.hash(password, SALT_ROUNDS),
+    );
+    return true;
+  }
+
+  async verifyEmail(token: string): Promise<boolean> {
+    const userId = await this.authRepository.consumeActionToken(
+      this.hashActionToken(token),
+      "email_verification",
+    );
+    if (!userId) return false;
+    await this.authRepository.markEmailVerified(userId);
+    return true;
   }
 
   async login(email: string, password: string, metadata: SessionMetadata = {}) {
@@ -128,6 +172,29 @@ export class AuthService {
 
   private createRefreshToken() {
     return randomBytes(48).toString("base64url");
+  }
+
+  private createActionToken() {
+    return randomBytes(32).toString("base64url");
+  }
+
+  private hashActionToken(token: string) {
+    return createHash("sha256").update(token).digest("hex");
+  }
+
+  private actionExpiry(minutes: number) {
+    return new Date(Date.now() + minutes * 60 * 1000);
+  }
+
+  private async issueEmailVerification(user: User) {
+    const token = this.createActionToken();
+    await this.authRepository.createActionToken(
+      user.id,
+      this.hashActionToken(token),
+      "email_verification",
+      this.actionExpiry(24 * 60),
+    );
+    await this.notifications.sendEmailVerification(user.email, token);
   }
 
   private hashRefreshToken(token: string) {

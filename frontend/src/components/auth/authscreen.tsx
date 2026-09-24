@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { User, Lock, Mail } from "lucide-react";
-import isotipo from "../../assets/isotipo.png";
+import isotipo from "../../assets/Isotipo_Cinefilo.png";
 import { register, login } from "../../api";
 import "./authscreen.css";
 
@@ -9,9 +9,10 @@ type Mode = "login" | "register";
 
 interface Props {
   onAuthSuccess: (token: string) => void;
+  onCancel?: () => void;
 }
 
-export default function AuthScreen({ onAuthSuccess }: Props) {
+export default function AuthScreen({ onAuthSuccess, onCancel }: Props) {
   const [mode, setMode] = useState<Mode>("login");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -51,8 +52,15 @@ export default function AuthScreen({ onAuthSuccess }: Props) {
         transition={{ duration: 0.4 }}
       >
         <div className="auth-icon">
-          <img src={isotipo} alt="BookFlow" />
+          <img src={isotipo} alt="Cinefilo" />
         </div>
+        {onCancel && (
+          <div className="auth-cancel-wrap">
+            <button type="button" className="auth-cancel" onClick={onCancel}>
+              <span aria-hidden="true">←</span> Volver a cartelera
+            </button>
+          </div>
+        )}
 
         <AnimatePresence mode="wait">
           <motion.form

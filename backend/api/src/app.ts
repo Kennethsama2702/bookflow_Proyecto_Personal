@@ -12,6 +12,8 @@ import { requireAuth, AuthenticatedRequest } from "./auth/auth.middleware";
 import { env } from "./config/env";
 import { requestContext } from "./shared/http/request-context";
 import { errorHandler } from "./shared/http/error-handler";
+import { AccessRepository } from "./access/access.repository";
+import { organizationRoutes } from "./access/organization.routes";
 
 export function buildApp() {
   const app = express();
@@ -34,6 +36,7 @@ export function buildApp() {
   const authRepository = new AuthRepository(pool);
   const authService = new AuthService(authRepository);
   const authController = new AuthController(authService);
+  const accessRepository = new AccessRepository(pool);
 
   app.get("/health", (_req, res) => res.json({ status: "ok" }));
   app.get("/health/ready", async (_req, res, next) => {
@@ -45,6 +48,7 @@ export function buildApp() {
     }
   });
   app.use(authRoutes(authController));
+  app.use(organizationRoutes(authService, accessRepository));
 
   // Ruta protegida de ejemplo: confirma que requireAuth funciona de punta a
   // punta antes de que exista bookings. Bookings la va a usar igual más adelante.

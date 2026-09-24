@@ -15,6 +15,8 @@ export interface SessionMetadata {
   ipAddress?: string;
 }
 
+export type AuthActionPurpose = "email_verification" | "password_reset";
+
 // Código de error de MySQL para "entrada duplicada" (viola un UNIQUE).
 // Es el equivalente al '23505' que usábamos en Postgres -- el nombre y el
 // código cambian por completo entre motores, hay que fijarse en la doc de cada uno.
@@ -158,6 +160,106 @@ export class AuthRepository {
       `UPDATE auth_sessions SET revoked_at = CURRENT_TIMESTAMP
        WHERE token_hash = ? AND revoked_at IS NULL`,
       [tokenHash],
+    );
+  }
+
+  async createActionToken(
+    userId: string,
+    tokenHash: string,
+    purpose: AuthActionPurpose,
+    expiresAt: Date,
+  ): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO auth_action_tokens (id, user_id, token_hash, purpose, expires_at)
+       VALUES (?, ?, ?, ?, ?)`,
+      [uuidv4(), userId, tokenHash, purpose, expiresAt],
+    );
+  }
+
+  async consumeActionToken(
+    tokenHash: string,
+    purpose: AuthActionPurpose,
+  ): Promise<string | null> {
+    const connection = await this.pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      const [rows] = await connection.query<any[]>(
+        `SELECT id, user_id, expires_at, used_at
+         FROM auth_action_tokens
+         WHERE token_hash = ? AND purpose = ?
+         FOR UPDATE`,
+        [tokenHash, purpose],
+      );
+      const token = rows[0];
+      if (!token || token.used_at || new Date(token.expires_at) <= new Date()) {
+        await connection.rollback();
+        return null;
+      }
+      await connection.query(
+        "UPDATE auth_action_tokens SET used_at = CURRENT_TIMESTAMP WHERE id = ?",
+        [token.id],
+      );
+      await connection.commit();
+      return token.user_id;
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  async markEmailVerified(userId: string): Promise<void> {
+    await this.pool.query(
+      "UPDATE users SET email_verified_at = COALESCE(email_verified_at, CURRENT_TIMESTAMP) WHERE id = ?",
+      [userId],
+    );
+  }
+
+  async updatePassword(userId: string, passwordHash: string): Promise<void> {
+    const connection = await this.pool.getConnection();
+    try {
+      await connection.beginTransaction();
+      await connection.query(
+        "UPDATE users SET password_hash = ? WHERE id = ?",
+        [passwordHash, userId],
+      );
+      await connection.query(
+        "UPDATE auth_sessions SET revoked_at = CURRENT_TIMESTAMP WHERE user_id = ? AND revoked_at IS NULL",
+        [userId],
+      );
+      await connection.commit();
+    } catch (error) {
+      await connection.rollback();
+      throw error;
+    } finally {
+      connection.release();
+    }
+  }
+
+  async audit(
+    actorUserId: string | null,
+    organizationId: string | null,
+    action: string,
+    entityType: string,
+    entityId: string | null,
+    metadata: Record<string, unknown> = {},
+    ipAddress?: string,
+  ): Promise<void> {
+    await this.pool.query(
+      `INSERT INTO audit_logs
+        (id, actor_user_id, organization_id, action, entity_type, entity_id, metadata, ip_address)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        uuidv4(),
+        actorUserId,
+        organizationId,
+        action,
+        entityType,
+        entityId,
+        JSON.stringify(metadata),
+        ipAddress ?? null,
+      ],
     );
   }
 }

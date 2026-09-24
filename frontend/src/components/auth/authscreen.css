@@ -5,13 +5,14 @@
   justify-content: center;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 50%, #2563eb 100%);
+  background:
+    radial-gradient(circle at 75% 15%, #3b321e 0%, transparent 34%), #080808;
 }
 
 .auth-blob {
   position: absolute;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(247, 183, 24, 0.09);
   filter: blur(2px);
 }
 
@@ -26,7 +27,7 @@
   height: 350px;
   bottom: -120px;
   left: -100px;
-  background: rgba(255, 255, 255, 0.04);
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .auth-card {
@@ -34,9 +35,9 @@
   width: 340px;
   padding: 2.5rem 2rem;
   border-radius: 20px;
-  background: rgba(255, 255, 255, 0.08);
+  background: rgba(19, 19, 19, 0.86);
   backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(247, 183, 24, 0.28);
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
   text-align: center;
 }
@@ -58,6 +59,28 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.auth-cancel-wrap {
+  display: flex;
+  justify-content: flex-start;
+  margin: -0.55rem 0 1.15rem;
+}
+
+.auth-cancel {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 0;
+  padding: 0.35rem 0;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.78rem;
+  cursor: pointer;
+}
+
+.auth-cancel:hover {
+  color: #fff;
 }
 
 .input-group {
@@ -101,7 +124,8 @@
   border: none;
   border-radius: 10px;
   background: white;
-  color: #1d4ed8;
+  color: #171717;
+  box-shadow: inset 0 -3px 0 #d99700;
   font-weight: 700;
   letter-spacing: 0.05em;
   font-size: 0.9rem;
@@ -121,7 +145,7 @@
 }
 
 .auth-error {
-  color: #fca5a5;
+  color: #ffb4a8;
   font-size: 0.85rem;
   margin-top: 0.9rem;
 }

@@ -6,12 +6,27 @@ import {
   CredencialesIncorrectasError,
   SesionInvalidaError,
 } from "./auth.errors";
-import { loginSchema, registerSchema } from "./auth.validation";
+import {
+  emailVerificationSchema,
+  loginSchema,
+  passwordResetRequestSchema,
+  passwordResetSchema,
+  registerSchema,
+} from "./auth.validation";
 import { logger } from "../shared/logging/logger";
+import { randomBytes } from "crypto";
+import { CSRF_COOKIE } from "./csrf.middleware";
 
 const REFRESH_COOKIE = "bookflow_refresh";
 const refreshCookieOptions = {
   httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax" as const,
+  path: "/auth",
+  maxAge: 30 * 60 * 1000,
+};
+const csrfCookieOptions = {
+  httpOnly: false,
   secure: process.env.NODE_ENV === "production",
   sameSite: "lax" as const,
   path: "/auth",
@@ -28,6 +43,14 @@ export class AuthController {
     };
   }
 
+  private setCsrfCookie(res: Response) {
+    res.cookie(
+      CSRF_COOKIE,
+      randomBytes(32).toString("base64url"),
+      csrfCookieOptions,
+    );
+  }
+
   register = async (req: Request, res: Response) => {
     try {
       const input = registerSchema.parse(req.body);
@@ -38,6 +61,7 @@ export class AuthController {
         this.metadata(req),
       );
       res.cookie(REFRESH_COOKIE, result.refreshToken, refreshCookieOptions);
+      this.setCsrfCookie(res);
       res.status(201).json(this.authService.publicAuthResponse(result));
     } catch (err) {
       if (err instanceof EmailRegistradoError) {
@@ -63,6 +87,7 @@ export class AuthController {
         this.metadata(req),
       );
       res.cookie(REFRESH_COOKIE, result.refreshToken, refreshCookieOptions);
+      this.setCsrfCookie(res);
       res.json(this.authService.publicAuthResponse(result));
     } catch (err) {
       if (err instanceof CredencialesIncorrectasError) {
@@ -79,6 +104,66 @@ export class AuthController {
     }
   };
 
+  requestPasswordReset = async (req: Request, res: Response) => {
+    try {
+      const input = passwordResetRequestSchema.parse(req.body);
+      await this.authService.requestPasswordReset(input.email);
+      res
+        .status(202)
+        .json({ message: "Si el correo existe, recibirás instrucciones" });
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return res.status(400).json({ error: "Los datos no son válidos" });
+      }
+      logger.error("password_reset_request_failed", {
+        requestId: req.requestId,
+        error: err,
+      });
+      res.status(500).json({ error: "Error interno" });
+    }
+  };
+
+  resetPassword = async (req: Request, res: Response) => {
+    try {
+      const input = passwordResetSchema.parse(req.body);
+      const reset = await this.authService.resetPassword(
+        input.token,
+        input.password,
+      );
+      if (!reset)
+        return res.status(400).json({ error: "Token inválido o expirado" });
+      res.status(204).send();
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return res.status(400).json({ error: "Los datos no son válidos" });
+      }
+      logger.error("password_reset_failed", {
+        requestId: req.requestId,
+        error: err,
+      });
+      res.status(500).json({ error: "Error interno" });
+    }
+  };
+
+  verifyEmail = async (req: Request, res: Response) => {
+    try {
+      const input = emailVerificationSchema.parse(req.body);
+      const verified = await this.authService.verifyEmail(input.token);
+      if (!verified)
+        return res.status(400).json({ error: "Token inválido o expirado" });
+      res.status(204).send();
+    } catch (err) {
+      if (err instanceof ZodError) {
+        return res.status(400).json({ error: "Los datos no son válidos" });
+      }
+      logger.error("email_verification_failed", {
+        requestId: req.requestId,
+        error: err,
+      });
+      res.status(500).json({ error: "Error interno" });
+    }
+  };
+
   refresh = async (req: Request, res: Response) => {
     try {
       const refreshToken = req.cookies?.[REFRESH_COOKIE];
@@ -88,6 +173,7 @@ export class AuthController {
         this.metadata(req),
       );
       res.cookie(REFRESH_COOKIE, result.refreshToken, refreshCookieOptions);
+      this.setCsrfCookie(res);
       res.json(this.authService.publicAuthResponse(result));
     } catch (err) {
       if (err instanceof SesionInvalidaError) {
@@ -110,6 +196,11 @@ export class AuthController {
       secure: refreshCookieOptions.secure,
       sameSite: refreshCookieOptions.sameSite,
       path: refreshCookieOptions.path,
+    });
+    res.clearCookie(CSRF_COOKIE, {
+      secure: csrfCookieOptions.secure,
+      sameSite: csrfCookieOptions.sameSite,
+      path: csrfCookieOptions.path,
     });
     res.status(204).send();
   };

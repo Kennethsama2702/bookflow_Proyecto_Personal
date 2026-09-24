@@ -2,35 +2,33 @@
   box-sizing: border-box;
 }
 
-/* Variables de tema. El atributo data-theme en <html> decide cuál set se usa
-   -- ThemeContext.tsx es quien lo cambia. La pantalla de login NO usa estas
-   variables a propósito: mantiene su identidad de marca (azul) sin importar el tema. */
+/* Paleta Cinefilo: negro de sala, blanco de proyección y amarillo marquesina. */
 :root,
 :root[data-theme="dark"] {
-  --bg-app: #0b1220;
-  --bg-sidebar: #0f172a;
-  --bg-surface: #1e293b;
-  --bg-surface-hover: #263449;
-  --border-subtle: #263449;
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --bg-app: #0d0d0d;
+  --bg-sidebar: #050505;
+  --bg-surface: #171717;
+  --bg-surface-hover: #262626;
+  --border-subtle: #333333;
+  --text-primary: #f7f5f0;
+  --text-secondary: #c6c1b7;
+  --text-muted: #8d887f;
+  --accent: #f7b718;
+  --accent-hover: #ffca3a;
   --danger: #f87171;
 }
 
 :root[data-theme="light"] {
-  --bg-app: #f1f5f9;
-  --bg-sidebar: #ffffff;
-  --bg-surface: #ffffff;
-  --bg-surface-hover: #f1f5f9;
-  --border-subtle: #e2e8f0;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #94a3b8;
-  --accent: #2563eb;
-  --accent-hover: #1d4ed8;
+  --bg-app: #f1efe9;
+  --bg-sidebar: #0d0d0d;
+  --bg-surface: #fffdf8;
+  --bg-surface-hover: #ebe7dc;
+  --border-subtle: #d5d0c5;
+  --text-primary: #171717;
+  --text-secondary: #595750;
+  --text-muted: #858078;
+  --accent: #d99700;
+  --accent-hover: #f7b718;
   --danger: #dc2626;
 }
 

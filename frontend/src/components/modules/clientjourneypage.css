@@ -1,0 +1,198 @@
+.client-journey {
+  min-height: 100vh;
+  padding: 34px clamp(20px, 6vw, 92px) 80px;
+  color: #f7f5f0;
+  background: #080808;
+}
+.journey-brand {
+  display: block;
+  width: 210px;
+  height: auto;
+  margin: 0 auto 28px;
+  border-radius: 3px;
+}
+.journey-back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 0;
+  background: transparent;
+  color: #a8a39a;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 0;
+}
+.journey-heading {
+  max-width: 720px;
+  margin: 58px auto 30px;
+  text-align: center;
+}
+.journey-heading h1 {
+  margin: 10px 0;
+  color: #fff;
+  font:
+    700 clamp(2.4rem, 6vw, 4.8rem)/0.98 Georgia,
+    "Times New Roman",
+    serif;
+  letter-spacing: -0.04em;
+}
+.journey-heading p,
+.journey-empty p,
+.payment-box p,
+.ticket-result p {
+  color: #a8a39a;
+}
+.journey-empty {
+  max-width: 620px;
+  margin: 15vh auto 0;
+  text-align: center;
+  display: grid;
+  justify-items: center;
+  gap: 12px;
+}
+.journey-empty h1 {
+  margin: 0;
+  color: #fff;
+  font:
+    700 clamp(2.3rem, 5vw, 4rem)/1 Georgia,
+    "Times New Roman",
+    serif;
+}
+.journey-primary {
+  border: 0;
+  background: #f7b718;
+  color: #171717;
+  padding: 12px 18px;
+  border-radius: 4px;
+  font-weight: 800;
+  cursor: pointer;
+}
+.journey-progress {
+  display: flex;
+  justify-content: center;
+  gap: 9px;
+  flex-wrap: wrap;
+  margin-bottom: 28px;
+}
+.journey-progress span {
+  padding: 8px 12px;
+  border: 1px solid #343434;
+  color: #a8a39a;
+  border-radius: 4px;
+  font-size: 0.84rem;
+}
+.journey-progress .current {
+  border-color: #f7b718;
+  color: #f7b718;
+  background: #1b1b1b;
+}
+.journey-progress .done {
+  border-color: #4d8065;
+  color: #78b28d;
+}
+.seat-layout,
+.payment-box,
+.ticket-result {
+  max-width: 680px;
+  margin: 0 auto;
+  padding: 28px;
+  background: #171717;
+  border: 1px solid #343434;
+  border-radius: 6px;
+  text-align: center;
+}
+.screen-label {
+  margin: 0 auto 34px;
+  padding: 8px;
+  max-width: 320px;
+  border-top: 4px solid #f7b718;
+  color: #a8a39a;
+  font-size: 0.7rem;
+  letter-spacing: 0.16em;
+}
+.seat-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 12px;
+  max-width: 390px;
+  margin: 0 auto 30px;
+}
+.seat {
+  aspect-ratio: 1;
+  border: 1px solid #4a4a4a;
+  border-radius: 4px;
+  background: #242424;
+  color: #a8a39a;
+  cursor: pointer;
+}
+.seat.selected-seat {
+  background: #f7b718;
+  border-color: #f7b718;
+  color: #171717;
+}
+.payment-box {
+  display: grid;
+  justify-items: center;
+  gap: 14px;
+}
+.payment-box h2,
+.ticket-result h2 {
+  margin: 0;
+  color: #fff;
+  font-family: Georgia, "Times New Roman", serif;
+}
+.fake-qr {
+  width: 150px;
+  height: 150px;
+  display: grid;
+  place-items: center;
+  margin: 0 auto 18px;
+  background: repeating-linear-gradient(45deg, #171717 0 5px, #fff 5px 10px);
+  color: #fff;
+  border: 12px solid #fff;
+  box-shadow: 0 0 0 1px #343434;
+}
+.concession-grid {
+  max-width: 1000px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+}
+.concession-card {
+  display: grid;
+  gap: 9px;
+  padding: 22px;
+  background: #171717;
+  border: 1px solid #343434;
+  border-radius: 5px;
+}
+.concession-card h2 {
+  margin: 4px 0 0;
+  color: #fff;
+  font:
+    700 1.35rem Georgia,
+    "Times New Roman",
+    serif;
+}
+.concession-card p {
+  margin: 0 0 8px;
+  color: #a8a39a;
+}
+.concession-card strong {
+  color: #f7b718;
+  font-size: 1.15rem;
+}
+@media (max-width: 720px) {
+  .concession-grid {
+    grid-template-columns: 1fr;
+  }
+  .seat-grid {
+    gap: 8px;
+  }
+  .seat-layout,
+  .payment-box,
+  .ticket-result {
+    padding: 20px 14px;
+  }
+}

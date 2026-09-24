@@ -32,12 +32,19 @@ BookFlow sera un sistema hibrido B2C + B2B para una cadena de cine.
 
 ### Fase 2: Identidad, usuarios y autorizacion
 
-- RBAC server-side: ADMINISTRADOR, SUPERVISOR, PERSONAL_ACCESO, PERSONAL_CONFITERIA y CLIENTE.
-- Organizaciones, sedes y aislamiento tenant-aware.
-- Recuperacion de contrasena y verificacion de correo.
-- Auditoria de sesiones y operaciones administrativas.
-- CSRF para flujos basados en cookie.
-- Tests de autenticacion, RBAC, IDOR y escalamiento de privilegios.
+- [x] RBAC server-side: ADMINISTRADOR, SUPERVISOR, PERSONAL_ACCESO, PERSONAL_CONFITERIA y CLIENTE.
+- [x] Organizaciones, membresías y permisos tenant-aware.
+- [x] Creación y listado de organizaciones autenticadas.
+- [x] Middleware `X-Organization-Id` + permiso consultado en base de datos.
+- [x] CSRF doble cookie/header para refresh y logout web.
+- [x] Recuperación de contraseña con tokens de un solo uso y revocación de sesiones.
+- [x] Verificación de correo con tokens de un solo uso.
+- [x] Auditoría básica de operaciones de membresías por organización.
+- [x] Gestión administrativa de miembros y roles con permisos server-side.
+- [x] Tests de permisos, aislamiento lógico y CSRF.
+- [ ] Integración de proveedor real de correo y plantillas de notificación.
+- [ ] Gestión visible y revocable de sesiones activas.
+- [ ] Tests de integración RBAC contra MySQL y tests IDOR completos.
 
 ### Fase 3: Catalogo y operacion del cine
 

@@ -1,5 +1,12 @@
 const API_URL = "http://localhost:3000";
 
+function csrfToken() {
+  return document.cookie
+    .split("; ")
+    .find((cookie) => cookie.startsWith("bookflow_csrf="))
+    ?.split("=")[1];
+}
+
 export interface AuthResponse {
   token: string;
   userId: string;
@@ -49,6 +56,7 @@ export async function refresh(): Promise<AuthResponse> {
   const res = await fetch(`${API_URL}/auth/refresh`, {
     method: "POST",
     credentials: "include",
+    headers: { "X-CSRF-Token": csrfToken() ?? "" },
   });
   return handleResponse<AuthResponse>(res);
 }
@@ -57,11 +65,34 @@ export async function logout(): Promise<void> {
   await fetch(`${API_URL}/auth/logout`, {
     method: "POST",
     credentials: "include",
+    headers: { "X-CSRF-Token": csrfToken() ?? "" },
   });
 }
 
 export interface MeResponse {
   user: { id: string; email: string; fullName: string };
+}
+
+export type UserRole =
+  | "ADMINISTRADOR"
+  | "SUPERVISOR"
+  | "PERSONAL_ACCESO"
+  | "PERSONAL_CONFITERIA"
+  | "CLIENTE";
+
+export interface OrganizationResponse {
+  id: string;
+  name: string;
+  role: UserRole;
+}
+
+export async function fetchOrganizations(
+  token: string,
+): Promise<{ organizations: OrganizationResponse[] }> {
+  const res = await fetch(`${API_URL}/organizations`, {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  return handleResponse<{ organizations: OrganizationResponse[] }>(res);
 }
 
 export async function fetchMe(token: string): Promise<MeResponse> {

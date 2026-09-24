@@ -63,3 +63,29 @@ test("logger redacts credentials and tokens recursively", () => {
     },
   );
 });
+
+test("refresh rejects requests without CSRF protection", async () => {
+  const { app } = buildApp();
+  const server = app.listen(0);
+  await new Promise<void>((resolve) =>
+    server.once("listening", () => resolve()),
+  );
+
+  try {
+    const address = server.address();
+    assert.ok(address && typeof address !== "string");
+    const response = await fetch(
+      `http://127.0.0.1:${address.port}/auth/refresh`,
+      {
+        method: "POST",
+        headers: { Cookie: "bookflow_refresh=opaque-refresh-token" },
+      },
+    );
+    assert.equal(response.status, 403);
+    assert.equal((await response.json()).error.code, "CSRF_REQUIRED");
+  } finally {
+    await new Promise<void>((resolve, reject) =>
+      server.close((error) => (error ? reject(error) : resolve())),
+    );
+  }
+});
