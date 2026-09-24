@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   gap: 1.2rem;
-  background: rgba(15, 23, 42, 0.55);
+  background: rgb(0, 0, 0);
   backdrop-filter: blur(14px);
   color: white;
   font-size: 0.95rem;
